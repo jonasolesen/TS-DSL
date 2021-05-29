@@ -1,5 +1,6 @@
 import { QueryEngine } from 'src/client/QueryEngine'
-import { Client, tableData, TableData } from 'src/client/generated'
+import { Client, FunctionData, tableFunctions, tableData, TableData } from 'src/client/generated'
+import { flow } from 'fp-ts/function'
 
 let client: Client
 
@@ -9,16 +10,46 @@ export function getClient(): Client {
   const newClient: Partial<Client> = {}
 
   Object.entries(tableData).forEach(([typeName, tableData]) => {
+    // @ts-ignore
     newClient[typeName as keyof Client] = generateDelegate(queryEngine, tableData)
+
+    const functions = tableFunctions[typeName as keyof Client]
+    if (functions) Object.entries(functions).forEach(([name, data]) => {
+      // @ts-ignore
+      newClient[typeName as keyof Client][name]! = generateQuery(data)
+    })
   })
 
   return client = newClient as Client
 }
 
+const getUserArgs = (args?: Record<string, unknown>): Record<string, unknown> => args ?? {}
+
+function generateQuery({ type, where, data, select }: FunctionData) {
+  return flow(
+    getUserArgs,
+    (args) => ({
+      where: {
+        ...where,
+        ...args
+      }
+    }),
+    (args) => ({
+      ...args,
+      data,
+      select
+    }),
+    (args: any) => getClient().user[type](args)
+  )
+}
+
 interface Delegate {
   findFirst(args: any): any
+
   delete(where: any): Promise<number>
+
   create(data: any): Promise<any>
+
   update(args: any): Promise<any>
 }
 

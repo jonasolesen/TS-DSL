@@ -7,13 +7,20 @@ table User:
     id: int primary
     firstName: string
     lastName: string
-    age: int
-        constraint age >= 18
+    	constraint it equals "test"
+	age: int
+        constraint it >= 18 && it == 18
     phone: string?
         constraint "\\d{8}"
     email: string
         constraint "^\\S+@\\S+\\.\\S+$"
+    isSubscribed: boolean
     address: Address?
+
+    testPhone: read(firstName, phone contains "1234", age >= 17) select age
+    test2: create(age: 18, firstName: "Lars", lastName: "test", email: "test@lars.dk", isSubscribed: true)
+    unsubscribe: update(age, isSubscribed is true) set(isSubscribed: false)
+    test4: delete(id == 2)
 
 table Address:
     id: string primary

@@ -26,7 +26,7 @@ export class QueryEngine {
     return query.first()
   }
 
-  async create(tableData: TableData, data: Record<string, unknown>): Promise<any> {
+  async create(tableData: TableData, { data }: { data: Record<string, unknown> }): Promise<any> {
     try {
       if (!this.checkConstraints(tableData, data)) throw new Error(`A constraint failed during ${tableData.tableName} insert`)
 

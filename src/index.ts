@@ -7,14 +7,22 @@ async function test() {
   const client = getClient()
 
   const newLars = await client.user.create({
-    firstName: 'Lars',
-    lastName: 'Larsen',
-    age: 99,
-    email: 'lars@larsen.com',
-    phone: '12345678'
+    data: {
+      firstName: 'Lars',
+      lastName: 'test',
+      age: 18,
+      email: 'lars@larsen.com',
+      isSubscribed: true,
+      phone: '12345678'
+    }
   })
 
   console.log('Created:', newLars)
+  const test = await client.user.testPhone({ firstName: 'Lars' })
+  console.log('test', test)
+
+  const unsubscribe = await client.user.test2()
+  console.log(unsubscribe)
 
   const lars = await client.user.findFirst({
     where: {
@@ -26,8 +34,8 @@ async function test() {
     select: {
       id: true,
       firstName: true,
-      phone: true
-    }
+      phone: true,
+    },
   })
 
   console.log('Found:', lars)
@@ -37,7 +45,7 @@ async function test() {
       firstName: 'Lars'
     },
     data: {
-      lastName: 'Jørgensen'
+      lastName: 'test'
     }
   })
 
@@ -47,7 +55,7 @@ async function test() {
     firstName: 'Lars'
   })
 
-  console.log('Lars\' purged:', numberOfLarsRemoved)
+  console.log("Lars' purged:", numberOfLarsRemoved)
 }
 
 test().finally(() => process.exit())

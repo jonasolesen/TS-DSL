@@ -9,7 +9,6 @@
     "lib": [
       "ESNext",
       "ESNext.AsyncIterable",
-      "DOM"
     ],
     "types": [
       "node"
