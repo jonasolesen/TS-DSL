@@ -17,15 +17,16 @@ table User:
     isSubscribed: boolean
     address: Address?
 
-    subscribersByAge: read(age, isSubscribed is true) select firstName age
-    newSubscriber: create(age, email, firstName, lastName, isSubscribed: true)
-    unsubscribe: update(firstName, isSubscribed is true) set(isSubscribed: false)
-    unsubscribeAll: update(isSubscribed is true) set(isSubscribed: false)
-    deleteLars: delete(firstName equals "Lars")
-
 table Address:
     id: string primary
     street: string
         constraint "^\\S+@\\S+\\.\\S+$"
     zipcode: int
     city: string
+
+functions<User>:
+    subscribersByAge: read(age, isSubscribed is true) select firstName age
+    newSubscriber: create(age, email, firstName, lastName, isSubscribed: true)
+    unsubscribe: update(firstName, isSubscribed is true) set(isSubscribed: false)
+    unsubscribeAll: update(isSubscribed is true) set(isSubscribed: false)
+    deleteLars: delete(firstName equals "Lars")
