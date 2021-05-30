@@ -16,19 +16,28 @@ async function test() {
       phone: '12345678'
     }
   })
-
   console.log('Created:', newLars)
-  const test = await client.user.testPhone({ firstName: 'Lars' })
-  console.log('test', test)
 
-  const unsubscribe = await client.user.test2()
-  console.log(unsubscribe)
+  const subscriber = await client.user.newSubscriber({
+    firstName: 'Lars',
+    age: 20,
+    lastName: 'test',
+    email: 'test@lars.com'
+  })
+  console.log('New subscribed user:', subscriber)
+
+  const age = 20
+  const subscribersByAge = await client.user.subscribersByAge({ age })
+  console.log(`Subscriber with age ${age}:`, subscribersByAge)
+
+  const unsubscribed = await client.user.unsubscribe({ firstName: 'Lars' })
+  console.log('Unsubscribed:', unsubscribed)
 
   const lars = await client.user.findFirst({
     where: {
       id: { gte: 1 },
       firstName: { contains: 'L' },
-      lastName: 'Larsen',
+      lastName: 'test',
       NOT: { email: { contains: 'yahoo' } }
     },
     select: {
@@ -37,7 +46,6 @@ async function test() {
       phone: true,
     },
   })
-
   console.log('Found:', lars)
 
   const updatedLars = await client.user.update({
@@ -48,14 +56,10 @@ async function test() {
       lastName: 'test'
     }
   })
-
   console.log('Updated:', updatedLars)
 
-  const numberOfLarsRemoved = await client.user.delete({
-    firstName: 'Lars'
-  })
-
-  console.log("Lars' purged:", numberOfLarsRemoved)
+  const removedUsers = await client.user.deleteLars()
+  console.log('Lars\' purged:', removedUsers)
 }
 
 test().finally(() => process.exit())

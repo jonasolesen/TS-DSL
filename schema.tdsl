@@ -7,9 +7,9 @@ table User:
     id: int primary
     firstName: string
     lastName: string
-    	constraint it equals "test"
+    	constraint it contains "test"
 	age: int
-        constraint it >= 18 && it == 18
+        constraint it >= 18
     phone: string?
         constraint "\\d{8}"
     email: string
@@ -17,10 +17,11 @@ table User:
     isSubscribed: boolean
     address: Address?
 
-    testPhone: read(firstName, phone contains "1234", age >= 17) select age
-    test2: create(age: 18, firstName: "Lars", lastName: "test", email: "test@lars.dk", isSubscribed: true)
-    unsubscribe: update(age, isSubscribed is true) set(isSubscribed: false)
-    test4: delete(id == 2)
+    subscribersByAge: read(age, isSubscribed is true) select firstName age
+    newSubscriber: create(age, email, firstName, lastName, isSubscribed: true)
+    unsubscribe: update(firstName, isSubscribed is true) set(isSubscribed: false)
+    unsubscribeAll: update(isSubscribed is true) set(isSubscribed: false)
+    deleteLars: delete(firstName equals "Lars")
 
 table Address:
     id: string primary

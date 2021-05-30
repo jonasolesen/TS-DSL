@@ -26,6 +26,11 @@ export function getClient(): Client {
 const getUserArgs = (args?: Record<string, unknown>): Record<string, unknown> => args ?? {}
 
 function generateQuery({ type, where, data, select }: FunctionData) {
+  const mergeData = (userData: Record<'where', any>): Record<string, unknown> => type === 'create' ? {
+    ...userData.where,
+    ...data
+  } : data
+
   return flow(
     getUserArgs,
     (args) => ({
@@ -35,8 +40,8 @@ function generateQuery({ type, where, data, select }: FunctionData) {
       }
     }),
     (args) => ({
-      ...args,
-      data,
+      where: type === 'create' ? undefined : args.where,
+      data: mergeData(args),
       select
     }),
     (args: any) => getClient().user[type](args)
