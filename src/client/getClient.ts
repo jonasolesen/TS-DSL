@@ -7,44 +7,36 @@ let client: Client
 export function getClient(): Client {
   if (client) return client
   const queryEngine = new QueryEngine()
-  const newClient: Partial<Client> = {}
+  const newClient: Record<string, any> = {}
+  let tableName: keyof Client
 
-  Object.entries(tableData).forEach(([typeName, tableData]) => {
-    // @ts-ignore
-    newClient[typeName as keyof Client] = generateDelegate(queryEngine, tableData)
+  for (tableName in tableData) {
+    newClient[tableName] = generateDelegate(queryEngine, tableData[tableName])
 
-    const functions = tableFunctions[typeName as keyof Client]
+    const functions = tableFunctions[tableName]
     if (functions) Object.entries(functions).forEach(([name, data]) => {
-      // @ts-ignore
-      newClient[typeName as keyof Client][name]! = generateQuery(data)
+      newClient[tableName][name] = generateQuery(tableName, data)
     })
-  })
+  }
 
   return client = newClient as Client
 }
 
-const getUserArgs = (args?: Record<string, unknown>): Record<string, unknown> => args ?? {}
-
-function generateQuery({ type, where, data, select }: FunctionData) {
-  const mergeData = (userData: Record<'where', any>): Record<string, unknown> => type === 'create' ? {
-    ...userData.where,
+function generateQuery(tableName: keyof Client, { type, where, data, select }: FunctionData) {
+  const mergeData = (userData: Record<string, unknown>) => type === 'create' ? {
+    ...userData,
     ...data
-  } : data
+  } : data ?? {}
 
   return flow(
-    getUserArgs,
+    (args?: Record<string, unknown>) => args ?? {},
     (args) => ({
-      where: {
-        ...where,
-        ...args
-      }
-    }),
-    (args) => ({
-      where: type === 'create' ? undefined : args.where,
+      where: type === 'create' ? undefined : { ...where, ...args },
       data: mergeData(args),
       select
     }),
-    (args: any) => getClient().user[type](args)
+    // @ts-ignore
+    (args: any) => getClient()[tableName][type](args)
   )
 }
 

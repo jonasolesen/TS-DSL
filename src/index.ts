@@ -6,23 +6,23 @@ dotenv.config()
 async function test() {
   const client = getClient()
 
-  const newLars = await client.user.create({
+  const newUser = await client.user.create({
     data: {
-      firstName: 'Lars',
-      lastName: 'test',
+      firstName: 'John',
+      lastName: 'Smith',
       age: 18,
-      email: 'lars@larsen.com',
+      email: 'john@smith.com',
       isSubscribed: true,
       phone: '12345678'
     }
   })
-  console.log('Created:', newLars)
+  console.log('Created:', newUser)
 
   const subscriber = await client.user.newSubscriber({
-    firstName: 'Lars',
+    firstName: 'Jane',
     age: 20,
-    lastName: 'test',
-    email: 'test@lars.com'
+    lastName: 'Doe',
+    email: 'jane@doe.com'
   })
   console.log('New subscribed user:', subscriber)
 
@@ -30,14 +30,13 @@ async function test() {
   const subscribersByAge = await client.user.subscribersByAge({ age })
   console.log(`Subscriber with age ${age}:`, subscribersByAge)
 
-  const unsubscribed = await client.user.unsubscribe({ firstName: 'Lars' })
+  const unsubscribed = await client.user.unsubscribe({ firstName: 'John' })
   console.log('Unsubscribed:', unsubscribed)
 
-  const lars = await client.user.findFirst({
+  const found = await client.user.findFirst({
     where: {
       id: { gte: 1 },
-      firstName: { contains: 'L' },
-      lastName: 'test',
+      firstName: { contains: 'J' },
       NOT: { email: { contains: 'yahoo' } }
     },
     select: {
@@ -46,20 +45,20 @@ async function test() {
       phone: true,
     },
   })
-  console.log('Found:', lars)
+  console.log('Found:', found)
 
-  const updatedLars = await client.user.update({
+  const updated = await client.user.update({
     where: {
-      firstName: 'Lars'
+      firstName: 'John'
     },
     data: {
-      lastName: 'test'
+      lastName: 'Johnson'
     }
   })
-  console.log('Updated:', updatedLars)
+  console.log('Updated:', updated)
 
-  const removedUsers = await client.user.deleteLars()
-  console.log('Lars\' purged:', removedUsers)
+  const removedUsers = await client.user.deleteJohn()
+  console.log('Johns purged:', removedUsers)
 }
 
 test().finally(() => process.exit())

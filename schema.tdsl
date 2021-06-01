@@ -7,7 +7,6 @@ table User:
     id: int primary
     firstName: string
     lastName: string
-    	constraint it contains "test"
 	age: int
         constraint it >= 18
     phone: string?
@@ -25,8 +24,8 @@ table Address:
     city: string
 
 functions<User>:
-    subscribersByAge: read(age, isSubscribed is true) select firstName age
+    subscribersByAge: read(age, isSubscribed == true) select firstName age
     newSubscriber: create(age, email, firstName, lastName, isSubscribed: true)
-    unsubscribe: update(firstName, isSubscribed is true) set(isSubscribed: false)
-    unsubscribeAll: update(isSubscribed is true) set(isSubscribed: false)
-    deleteLars: delete(firstName equals "Lars")
+    unsubscribe: update(firstName, isSubscribed == true) set(isSubscribed: false)
+    unsubscribeAll: update(isSubscribed == true) set(isSubscribed: false)
+    deleteJohn: delete(firstName == "John")
